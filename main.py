@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter as tk
 from PIL import Image,ImageTk
 
-global botaoNum, botaoCoord
+global botaoNum, botaoCoord, lines
 
 def pegaTamanho(tamanho):
     tamanho = float(tamanho.get())
@@ -15,12 +15,13 @@ def pegaForca(forca):
     
 
 def mudarCoords(num, x, y, x2, y2):
-    x = 20*int(x.get()) 
-    y = 20*int(y.get())
-    x2 = 20*int(x2.get())
-    y2 = 20*int(y2.get())
-    canvas.coords(lines[num], x, y, x2, y2)
-    
+    global lines
+    x = 20*float(x.get()) 
+    y = 20*float(y.get())
+    x2 = 20*float(x2.get())
+    y2 = 20*float(y2.get())
+    print(lines)
+    canvas.coords(lines[num], x, y, x2, y2)    
     
 def adicionaBarra():
     barra.config(relief=SUNKEN)
@@ -29,6 +30,7 @@ def adicionaBarra():
 
     
 def click(e):
+    global lines
     # define start point for line
     coords["x"] = e.x
     coords["y"] = e.y
@@ -38,6 +40,7 @@ def click(e):
 
 
 def drag(e):
+    global lines
     # update the coordinates from the event
     coords["x2"] = e.x
     coords["y2"] = e.y
@@ -49,6 +52,7 @@ def drag(e):
         coords["y2"] = coords["y"]
     if difX < 20:
         coords["x2"] = coords["x"]
+        
     
     canvas.itemconfigure(text1, text="x1: {}".format(coords["x"]/20))
     canvas.itemconfigure(text2, text="y1: {}".format(coords["y"]/20))
@@ -62,6 +66,7 @@ def excluirBarra(num, janela):
     print(num)
     global botaoNum  
     global botaoCoord
+    global lines
     canvas.delete(lines[num])
     lines[num] = None
     botaoBarra[num].destroy()
@@ -178,8 +183,8 @@ botaoNum = 0
 barra = tk.Button(root, text='Adicionar barras', command=adicionaBarra)
 barra.place(relx=0.02, rely=0.05, relwidth=0.15, relheight=0.04, anchor='w')
 
-vinculo = tk.Button(root, text='Adicionar vinculos')
-vinculo.place(relx=0.02, rely=0.1, relwidth=0.15, relheight=0.04, anchor='w')
+# vinculo = tk.Button(root, text='Adicionar vinculos')
+# vinculo.place(relx=0.02, rely=0.1, relwidth=0.15, relheight=0.04, anchor='w')
 
 tamanho = tk.Label(root, text='Tamanho da barra:')
 tamanho.place(relx=0.02, rely=0.2, relwidth=0.1, relheight=0.04, anchor='w')
