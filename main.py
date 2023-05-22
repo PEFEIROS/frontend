@@ -2,29 +2,7 @@ from tkinter import *
 import tkinter as tk
 from PIL import Image,ImageTk
 
-global botaoNum
-
-# class Barra:
-    #def __init__(self, x, y, x2, y2):
-        #self.x = x
-        #self.x2 = x2
-        #self.y = y
-        #self.y2 = y2
-        # adicionar vinculos
-    #def getStart(self):
-        #return (self.x, self.y)
-    #def getEnd(self):
-        #return (self.x2, self.y2)
-    #def setStart(self, x, y):
-        #self.x = x
-        #self.y = y
-    #def setEnd(self, x2, y2):
-        #self.x2 = x2
-        #self.y2 = y2
-
-# class BotaoDaBarra:
-   # def __init__(self, barra) -> None:
-       # self.barra = barra
+global botaoNum, botaoCoord
 
 def pegaTamanho(tamanho):
     tamanho = float(tamanho.get())
@@ -34,7 +12,15 @@ def pegaTamanho(tamanho):
 def pegaForca(forca):
     forca = float(forca.get())
     print(forca)
+    
 
+def mudarCoords(num, x, y, x2, y2):
+    x = 20*int(x.get()) 
+    y = 20*int(y.get())
+    x2 = 20*int(x2.get())
+    y2 = 20*int(y2.get())
+    canvas.coords(lines[num], x, y, x2, y2)
+    
     
 def adicionaBarra():
     barra.config(relief=SUNKEN)
@@ -46,24 +32,57 @@ def click(e):
     # define start point for line
     coords["x"] = e.x
     coords["y"] = e.y
-
     # create a line on this point and store it in the list
     lines.append(canvas.create_line(coords["x"], coords["y"], coords["x"], coords["y"], fill="black", width=4))
-    
     adicionaBarraBotao()
+
 
 def drag(e):
     # update the coordinates from the event
     coords["x2"] = e.x
     coords["y2"] = e.y
 
-    # Change the coordinates of the last created line to the new coordinates
-    canvas.coords(lines[-1], coords["x"], coords["y"], coords["x2"], coords["y2"])
+    # Change the coordinates of the last created line to the new coordinates    
+    difX = abs(coords["x"] - coords["x2"])
+    difY = abs(coords["y"] - coords["y2"])
+    if difY < 20:
+        coords["y2"] = coords["y"]
+    if difX < 20:
+        coords["x2"] = coords["x"]
     
+    canvas.itemconfigure(text1, text="x1: {}".format(coords["x"]/20))
+    canvas.itemconfigure(text2, text="y1: {}".format(coords["y"]/20))
+    canvas.itemconfigure(text3, text="x2: {}".format(coords["x2"]/20))
+    canvas.itemconfigure(text4, text="y2: {}".format(coords["y2"]/20))
+    
+    canvas.coords(lines[-1], coords["x"], coords["y"], coords["x2"], coords["y2"])
+
+
+def excluirBarra(num, janela):
+    print(num)
+    global botaoNum  
+    global botaoCoord
+    canvas.delete(lines[num])
+    lines[num] = None
+    botaoBarra[num].destroy()
+    botaoBarra[num] = None
+    janela.destroy()
+
+    botaoCoord = {"relx":0.01, "rely":0.55}
+
+    for i in range(botaoNum):
+        if type(botaoBarra[i]) != type(None):
+            botaoBarra[i].config(text="Botao {}".format(i + 1))
+            botaoBarra[i].place(relx=botaoCoord["relx"], rely=botaoCoord["rely"], relwidth=0.05, relheight=0.04, anchor='w')        
+            botaoCoord["relx"] += 0.06 
+            if (botaoCoord["relx"] > 0.14):
+                botaoCoord["relx"] = 0.01
+                botaoCoord["rely"] += 0.06
+            
     
 def botaoMenu(num):
     janela = Toplevel(root)
-    janela.title("Botao {}".format(num))
+    janela.title("Barra {}".format(num + 1))
     janela.geometry('360x200')
     janela.minsize(360, 200)
     janela.maxsize(360, 200)
@@ -71,41 +90,60 @@ def botaoMenu(num):
     xVar = tk.StringVar()
     # x label
     xLabel = tk.Label(janela, text='Coordenada x1')
-    xLabel.grid(row=0, column=0, sticky=tk.N)
+    
+    xLabel.grid(row=0, column=0, padx=5)
     
     # x entry
-    xEntry = tk.Entry(janela, textvariable=x, borderwidth=2, relief=tk.FLAT)
+    xEntry = tk.Entry(janela, textvariable=xVar, borderwidth=5, width=10, relief=tk.FLAT)
+    xEntry.insert(0, coords["x"]/20)
     xEntry.grid(row=1, column=0, padx=5, pady=5)
     
     yVar = tk.StringVar()
     # y label
     yLabel = tk.Label(janela, text='Coordenada y1')
-    yLabel.grid(row=0, column=1, sticky=tk.N)
+    yLabel.grid(row=0, column=1, padx=5)
     
     #y entry
-    yEntry = tk.Entry(janela, textvariable=y, borderwidth=5, width=20, relief=tk.FLAT)
-    yEntry.place(row=1, column=1, sticky=tk.N, padx=5, pady=5)
+    yEntry = tk.Entry(janela, textvariable=yVar, borderwidth=5, width=10, relief=tk.FLAT)
+    yEntry.insert(0, coords["y"]/20)
+    yEntry.grid(row=1, column=1, padx=5, pady=5)
     
-    x1Var = tk.StringVar()
-    # x1 label
-    x1Label = tk.Label(janela, text='Coordenada y1')
-    x1Label.grid(row=0, column=1, sticky=tk.N)
+    x2Var = tk.StringVar()
+    # x2 label
+    x2Label = tk.Label(janela, text='Coordenada x2')
+    x2Label.grid(row=2, column=0, padx=5)
     
-    # x1 entry
-    x1Entry = tk.Entry(janela, textvariable=y, borderwidth=5, width=20, relief=tk.FLAT)
-    x1Entry.place(row=1, column=1, sticky=tk.N, padx=5, pady=5)
+    # x2 entry
+    x2Entry = tk.Entry(janela, textvariable=x2Var, borderwidth=5, width=10, relief=tk.FLAT)
+    x2Entry.insert(0, coords["x2"]/20)
+    x2Entry.grid(row=3, column=0, padx=5, pady=5)
+    
+    y2Var = tk.StringVar()
+    # y2 label
+    y2Label = tk.Label(janela, text='Coordenada y2')
+    y2Label.grid(row=2, column=1, padx=5)
+
+    # y2 entry
+    y2Entry = tk.Entry(janela, textvariable=y2Var, borderwidth=5, width=10, relief=tk.FLAT)
+    y2Entry.insert(0, coords["y2"]/20)
+    y2Entry.grid(row=3, column=1, padx=5, pady=5)
     
     # aplicar button
-    aplicar = tk.Button(janela, text="Aplicar", command=lambda: pegaForca(forcaVar))
-    aplicar.grid(row=3, column=3, padx=5, pady=5)
+    aplicar = tk.Button(janela, text="Aplicar", command=lambda: mudarCoords(num, xVar, yVar, x2Var, y2Var))
+    aplicar.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
     
+    # excluir button
+    aplicar = tk.Button(janela, text="Excluir Barra", command=lambda: excluirBarra(num, janela))
+    aplicar.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
+    
 
 def adicionaBarraBotao():
     global botaoNum
-    botaoNum += 1
-    botaoBarra.append(tk.Button(root, text="Barra {}".format(botaoNum), command=lambda num=botaoNum: botaoMenu(num)))
+    global botaoCoord
+    botaoBarra.append(tk.Button(root, text="Barra {}".format(botaoNum + 1), command=lambda num=botaoNum: botaoMenu(num)))
     botaoBarra[-1].place(relx=botaoCoord["relx"], rely=botaoCoord["rely"], relwidth=0.05, relheight=0.04, anchor='w')
+    botaoNum += 1
     botaoCoord["relx"] += 0.06
     
     if (botaoCoord["relx"] > 0.14):
@@ -113,8 +151,6 @@ def adicionaBarraBotao():
         botaoCoord["rely"] += 0.06
     
     
-
-
 root = tk.Tk()
 root.title('Projeto de PEF')
 root.geometry('800x640')
@@ -130,6 +166,11 @@ canvas.place(relx=1, rely=0.5, relwidth=0.8, relheight=1, anchor='e')
 coords = {"x":0,"y":0,"x2":0,"y2":0}
 # lista que armazena todas as coordenadas das barras
 lines = []
+
+text1 = canvas.create_text(50, 50, text="x1: ", fill="black", font='Calibri 12')
+text2 = canvas.create_text(50, 80, text="y1: ", fill="black", font='Calibri 12')
+text3 = canvas.create_text(110, 50, text="x2: ", fill="black", font='Calibri 12')
+text4 = canvas.create_text(110, 80, text="y2: ", fill="black", font='Calibri 12')
 
 botaoCoord = {"relx":0.01, "rely":0.55}
 botaoBarra = []
