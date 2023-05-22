@@ -35,7 +35,15 @@ def click(e):
     coords["x"] = e.x
     coords["y"] = e.y
     # create a line on this point and store it in the list
+    for line in lines:
+        if type(line) != type(None):
+            coordenadas = canvas.coords(line)
+            if abs(canvas.coords(line)[0] - coords["x"]) < 12 and abs(canvas.coords(line)[1] - coords["y"]) < 12:
+                coords["x"] = canvas.coords(line)[0]
+                coords["y"] = canvas.coords(line)[1]
+    
     lines.append(canvas.create_line(coords["x"], coords["y"], coords["x"], coords["y"], fill="black", width=4))
+    
     adicionaBarraBotao()
 
 
@@ -52,6 +60,18 @@ def drag(e):
         coords["y2"] = coords["y"]
     if difX < 20:
         coords["x2"] = coords["x"]
+    
+    for line in lines:
+        if type(line) != type(None):
+            coordenadas = canvas.coords(line)
+            if abs(canvas.coords(line)[0] - coords["x"]) < 12 and abs(canvas.coords(line)[1] - coords["y"]) < 12:
+                coords["x"] = canvas.coords(line)[0]
+                coords["y"] = canvas.coords(line)[1]
+
+            if abs(canvas.coords(line)[2] - coords["x2"]) < 12 and abs(canvas.coords(line)[3] - coords["y2"]) < 12:
+                coords["x2"] = canvas.coords(line)[2]
+                coords["y2"] = canvas.coords(line)[3]
+        
         
     
     canvas.itemconfigure(text1, text="x1: {}".format(coords["x"]/20))
