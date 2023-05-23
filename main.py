@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter as tk
 from PIL import Image,ImageTk
+import math
 
 global botaoNum, botaoCoord, lines
 
@@ -13,7 +14,7 @@ def pegaForca(forca):
     forca = float(forca.get())
     print(forca)
     
-
+    
 def mudarCoords(num, x, y, x2, y2):
     global lines
     x = 20*float(x.get()) 
@@ -71,8 +72,6 @@ def drag(e):
             if abs(canvas.coords(line)[2] - coords["x2"]) < 12 and abs(canvas.coords(line)[3] - coords["y2"]) < 12:
                 coords["x2"] = canvas.coords(line)[2]
                 coords["y2"] = canvas.coords(line)[3]
-        
-        
     
     canvas.itemconfigure(text1, text="x1: {}".format(coords["x"]/20))
     canvas.itemconfigure(text2, text="y1: {}".format(coords["y"]/20))
@@ -108,14 +107,13 @@ def excluirBarra(num, janela):
 def botaoMenu(num):
     janela = Toplevel(root)
     janela.title("Barra {}".format(num + 1))
-    janela.geometry('360x200')
-    janela.minsize(360, 200)
-    janela.maxsize(360, 200)
+    janela.geometry('300x180')
+    janela.minsize(300, 180)
+    janela.maxsize(300, 180)
     
-    xVar = tk.StringVar()
     # x label
+    xVar = tk.StringVar()
     xLabel = tk.Label(janela, text='Coordenada x1')
-    
     xLabel.grid(row=0, column=0, padx=5)
     
     # x entry
@@ -123,8 +121,8 @@ def botaoMenu(num):
     xEntry.insert(0, coords["x"]/20)
     xEntry.grid(row=1, column=0, padx=5, pady=5)
     
-    yVar = tk.StringVar()
     # y label
+    yVar = tk.StringVar()
     yLabel = tk.Label(janela, text='Coordenada y1')
     yLabel.grid(row=0, column=1, padx=5)
     
@@ -133,8 +131,8 @@ def botaoMenu(num):
     yEntry.insert(0, coords["y"]/20)
     yEntry.grid(row=1, column=1, padx=5, pady=5)
     
-    x2Var = tk.StringVar()
     # x2 label
+    x2Var = tk.StringVar()
     x2Label = tk.Label(janela, text='Coordenada x2')
     x2Label.grid(row=2, column=0, padx=5)
     
@@ -143,8 +141,8 @@ def botaoMenu(num):
     x2Entry.insert(0, coords["x2"]/20)
     x2Entry.grid(row=3, column=0, padx=5, pady=5)
     
-    y2Var = tk.StringVar()
     # y2 label
+    y2Var = tk.StringVar()
     y2Label = tk.Label(janela, text='Coordenada y2')
     y2Label.grid(row=2, column=1, padx=5)
 
@@ -160,7 +158,28 @@ def botaoMenu(num):
     # excluir button
     aplicar = tk.Button(janela, text="Excluir Barra", command=lambda: excluirBarra(num, janela))
     aplicar.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+    
+    # r label
+    rVar = tk.StringVar()
+    rLabel = tk.Label(janela, text='r')
+    rLabel.grid(row=0, column=2, padx=5)
+    
+    
+    # r entry
+    rEntry = tk.Entry(janela, textvariable=rVar, borderwidth=5, width=10, relief=tk.FLAT)
+    rEntry.insert(0, math.sqrt(math.pow((coords["x"] - coords["x2"]), 2) + math.pow((coords["y"] - coords["y2"]), 2)))
+    rEntry.grid(row=1, column=2, padx=5, pady=5)
+    
+    # theta label
+    thetaVar = tk.StringVar()
+    thetaLabel = tk.Label(janela, text='θ')
+    thetaLabel.grid(row=2, column=2, padx=5)
 
+    # theta entry
+    thetaEntry = tk.Entry(janela, textvariable=thetaVar, borderwidth=5, width=10, relief=tk.FLAT)
+    thetaEntry.insert(0, "{}°".format(math.tan((coords["y"] - coords["y2"])/(coords["x"] - coords["x2"]))))
+    thetaEntry.grid(row=3, column=2, padx=5, pady=5)
+    
     
 
 def adicionaBarraBotao():
@@ -194,8 +213,8 @@ lines = []
 
 text1 = canvas.create_text(50, 50, text="x1: ", fill="black", font='Calibri 12')
 text2 = canvas.create_text(50, 80, text="y1: ", fill="black", font='Calibri 12')
-text3 = canvas.create_text(110, 50, text="x2: ", fill="black", font='Calibri 12')
-text4 = canvas.create_text(110, 80, text="y2: ", fill="black", font='Calibri 12')
+text3 = canvas.create_text(130, 50, text="x2: ", fill="black", font='Calibri 12')
+text4 = canvas.create_text(130, 80, text="y2: ", fill="black", font='Calibri 12')
 
 botaoCoord = {"relx":0.01, "rely":0.55}
 botaoBarra = []
