@@ -4,43 +4,65 @@ from PIL import Image,ImageTk
 import math
 import numpy as np
 
-global botaoNum, botaoCoord, lines
-
+global botaoNum, botaoCoord, lines, forcas, sliderVar
+forcas = []
+    
 def pegaTamanho(tamanho):
     tamanho = float(tamanho.get())
     print(tamanho)
-
-
-def pegaForca(forca):
-    forca = float(forca.get())
-    print(forca)
     
     
-def adicionaFlecha(num):
+def aplicarForca(num, theta, forca):
+    global forcas, sliderVar
+    
+    slider = sliderVar.get()
+    try:
+        forca = float(forca.get())
+    except:
+        forca = 100
+
+    newX = slider*(math.cos(np.deg2rad(theta)))
+    newY = slider*(math.sin(np.deg2rad(theta)))
+
+    newX = canvas.coords(lines[num])[0] + newX
+    newY = canvas.coords(lines[num])[1] - newY
+
+    canvas.coords(forcas[num], newX, newY-forca, newX, newY)
+    
+    
+def addForca(num, mod, theta):
+    janela = Toplevel(root)
+    janela.title("Forca aplicada da barra {}".format(num + 1))
+    janela.geometry('480x360')
+    janela.minsize(220, 160)
+    janela.maxsize(220, 160)
+    
+    global forcas, sliderVar
     x = canvas.coords(lines[num])[0]
     y = canvas.coords(lines[num])[1]
-    canvas.create_line(x, y-100, x, y, arrow=tk.LAST)
-    
-    
-def addForca(num):
-    janela = Toplevel(root)
-    janela.title("Forca da barra {}".format(num + 1))
-    janela.geometry('480x360')
-    janela.minsize(200, 100)
-    janela.maxsize(200, 100)
+    forcas.insert(num, canvas.create_line(x, y-100, x, y, arrow=tk.LAST, width=2))
     
     # forca label
     forcaVar = tk.StringVar()
     forcaLabel = tk.Label(janela, text='Magnitude da forca aplicada:')
-    forcaLabel.grid(row=0, column=0, padx=5, columnspan=2, sticky=tk.W)
+    forcaLabel.grid(row=0, column=0, padx=5, sticky=tk.W)
     
     # forca entry
     forcaEntry = tk.Entry(janela, textvariable=forcaVar, borderwidth=5, relief=tk.FLAT)
     forcaEntry.grid(row=1, column=0, padx=5, pady=5)
     
+    # slider label
+    sliderLabel = tk.Label(janela, text='Posição:')
+    sliderLabel.grid(row=2, column=0, padx=2, sticky=tk.W)
+    
+    # slider
+    sliderVar = tk.DoubleVar()
+    slider = tk.Scale(janela, from_=0, to=mod, variable=sliderVar, orient='horizontal')
+    slider.grid(row=3, column=0, ipadx=50)
+    
     # aplicar forca button
-    aplicar = tk.Button(janela, text="Aplicar Força", command=lambda: adicionaFlecha(num))
-    aplicar.grid(row=2, column=0, padx=5, columnspan=2, pady=5, sticky=tk.W)
+    aplicar = tk.Button(janela, text="Aplicar Força", command=lambda: aplicarForca(num, theta, forcaVar))
+    aplicar.grid(row=4, column=0, padx=5, columnspan=2, pady=5, sticky=tk.W)
     
 
 def moduloTan (num):
@@ -206,8 +228,8 @@ def botaoMenu(num):
     janela = Toplevel(root)
     janela.title("Barra {}".format(num + 1))
     janela.geometry('480x360')
-    janela.minsize(300, 280)
-    janela.maxsize(300, 280)
+    janela.minsize(330, 280)
+    janela.maxsize(330, 280)
     
     # x label
     xVar = tk.StringVar()
@@ -285,21 +307,18 @@ def botaoMenu(num):
     spacer1.grid(row=5, column=0)
     
     # adicionar forca button
-    adicionarForca = tk.Button(janela, text="Força 1", command=lambda: addForca(num))
-    adicionarForca.grid(row=6, column=0, padx=5, pady=5, sticky=tk.N)
+    adicionarForca1 = tk.Button(janela, text="Força concentrada", command=lambda: addForca(num, mt[0], mt[1]))
+    adicionarForca1.grid(row=6, column=0, padx=5, pady=5, sticky=tk.N)
     
-    adicionarForca = tk.Button(janela, text="Força 2", command=lambda: addForca(num))
-    adicionarForca.grid(row=6, column=1, padx=5, pady=5, sticky=tk.N)
-    
-    adicionarForca = tk.Button(janela, text="Força 3", command=lambda: addForca(num))
-    adicionarForca.grid(row=6, column=2, padx=5, pady=5, sticky=tk.N)
+    adicionarForca2 = tk.Button(janela, text="Força distribuida", command=lambda: addForca(num))
+    adicionarForca2.grid(row=6, column=1, padx=5, pady=5, sticky=tk.N)
     
     spacer2 = tk.Label(janela, text="")
-    spacer2.grid(row=9, column=0, columnspan=3)
+    spacer2.grid(row=7, column=0, columnspan=3)
     
     # excluir button
     excluir = tk.Button(janela, text="Excluir Barra", command=lambda: excluirBarra(num, janela))
-    excluir.grid(row=10, column=0, padx=5, pady=5, sticky=tk.W)
+    excluir.grid(row=8, column=0, padx=5, pady=5, sticky=tk.W)
     
     
 
@@ -357,16 +376,6 @@ tamanhoEntrada.place(relx=0.02, rely=0.25, relwidth=0.12, relheight=0.04, anchor
 
 tamanhoBotao = tk.Button(root, text="Aplicar", command=lambda: pegaTamanho(tamanhoVar))
 tamanhoBotao.place(relx=0.15, rely=0.25, relwidth=0.045, relheight=0.04, anchor='w')
-
-forca = tk.Label(root, text='Forca aplicada no nó ##:')
-forca.place(relx=0.02, rely=0.4, relwidth=0.15, relheight=0.04, anchor='w')
-
-forcaVar = tk.StringVar()
-forcaEntrada = tk.Entry(root, textvariable=forcaVar, borderwidth=5, relief=tk.FLAT)
-forcaEntrada.place(relx=0.02, rely=0.45, relwidth=0.12, relheight=0.04, anchor='w')
-
-forcaBotao = tk.Button(root, text="Aplicar", command=lambda: pegaForca(forcaVar))
-forcaBotao.place(relx=0.15, rely=0.45, relwidth=0.045, relheight=0.04, anchor='w')
 
 # FUNCOES RELATIVAS A CRIACAO DE IMAGENS NO CANVAS
 imgEngaste = ImageTk.PhotoImage(Image.open("./ENGASTE.png"))
