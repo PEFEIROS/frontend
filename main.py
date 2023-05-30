@@ -4,6 +4,60 @@ from PIL import Image,ImageTk
 import math
 import numpy as np
 
+""" Implementações a serem consideradas """
+# !!!VER POSSIBILIDADE DE MUDAR CÓDIGO PARA ORIENTAÇÃO A OBJETOS!!!
+
+# ADICIONAR UM LABEL COM O NOME DA BARRA (exemplo: "Barra 1") AO LADO DE CADA 
+# BARRA PARA UMA VISUALIZAÇÃO MELHOR NO CANVAS
+
+
+""" Bugs a serem corrigidos """
+# CORRIGIR ERRO ONDE A FLECHA DA FORÇA CONCENTRADA É ADICIONADA TODA VEZ QUE
+# A JANELA É ABERTA NOVAMENTE. APENAS UMA FORÇA CONCENTRADA SERÁ APLICADA POR
+# BARRA? VERIFICAR A POSSIBILIDADE DE ADICIONAR MAIS FORÇAS.
+
+# CORRIGIR ERRO ONDE SLIDER DA FORÇA CONCENTRADA. O VALOR MÁXIMO DO SLIDER DA 
+# FORÇA NÃO ATUALIZA SE O MÓDULO(r) DA BARRA É ALTERADO DO VALOR INICIAL.
+
+# CORRIGIR ERRO EM QUE, SE O MÓDULO DA BARRA É ALTERADO APÓS UMA FORÇA É ADICIONADA
+# NA BARRA, A FORÇA FICA APLICADA FORA DA BARRA. VER SE VALE A PENA SIMPLESMENTE EXLUIR
+# A FORÇA SE ELA NÃO PERTENCE MAIS A BARRA OU IMPLEMENTAR UMA PROPORCIONALIDADE DA 
+# POSIÇÃO DA FORÇA EM RELAÇÃO AO TAMANHO DA BARRA.
+
+
+""" Implementações a serem feitas """
+# IMPLEMENTAR FUNÇÕES EXTRAS AO EXCLUIR UMA BARRA. NO MOMENTO QUANDO UMA BARRA É EXCLUIDA
+# A JANELA DA FORÇA CONCENTRADA NÃO SE FECHA E AS FLECHAS NÃO SÃO EXCLUIDAS DO CANVAS, ENTÃO
+# É NECESSÁRIO IMPLEMENTAR ISSO.
+
+# REMOVER FORÇA DISTRIBUIDA E VER POSSIBILIDADE DE AUMENTAR O NÚMERO DE FORÇAS CONCENTRADAS
+# POR BARRA. CASO AUMENTAR O NÚMERO DE FORÇAS PRA MAIS DE 1, UMA LISTA DE FORÇAS PRECISA
+# SER IMPLEMENTADA. 3 FORÇAS PARECE UM BOM NÚMERO.
+
+# IMPLEMENTAR ANGULAÇÃO DA FORÇA CONCENTRADA, USAR FUNÇÃO TANGENTE E VER IMPLEMENTAÇÃO DE
+# CÁLCULO DO ÂNGULO NA FUNÇÃO moduloTan() PARA FACILITAR A IMPLEMENTAÇÃO.
+
+# IMPLEMENTAR A ADIÇÃO DE VÍNCULOS (DUPLO, SIMPLES, ENGASTE)
+
+
+""" Tratamento de dados para serem enviados para o front """
+# Forças (lista só de vínculos):
+# componentes da força (X e Y)
+# coordenadas de aplicação
+
+# Momentos (lista só de momentos):
+# index do momento
+# valor (sentido já indicado no valor)
+
+# Vínculos (lista só de vínculos):
+# index do vínculo
+# tipo de vinculo ("Apoio Duplo", "Apoio Simples", "Engaste") <- NOMES TEM QUE SER ASSIM
+# posição do vinculo (X, Y)
+
+# Barra (lista só de barras): 
+# index da barra
+# !!!começo e final da barra não é necessário!!!
+
 global botaoNum, botaoCoord, lines, forcas, sliderVar
 forcas = []
     
