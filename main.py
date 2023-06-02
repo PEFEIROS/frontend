@@ -114,8 +114,8 @@ def main():
 def adicionaBarra(barra, coords, canvas, lines, text, botaoBarra, botaoCoord, root, forcas):
     barra.config(relief=SUNKEN)
     canvas.bind("<ButtonPress-1>", lambda event: click(coords, canvas, lines, botaoBarra, 
-                                                       botaoCoord, root, barra,
-                                                       forcas, e=event))
+                                                       botaoCoord, root, barra, forcas, 
+                                                       e=event))
     canvas.bind("<B1-Motion>", lambda event: drag(coords, canvas, lines, text, e=event))
 
     
