@@ -59,6 +59,8 @@ import numpy as np
 # !!!começo e final da barra não é necessário!!!
 
 def main():
+    global botaoNum
+    botaoNum = 0
     root = tk.Tk()
     root.title('Projeto de PEF')
     root.geometry('800x640')
@@ -70,7 +72,6 @@ def main():
     text = []
     botaoBarra = []
     forcas = []
-    botaoNum = 0
     
     # label 1
     label1 = tk.Label(root, bg='#abaaa9')
@@ -86,7 +87,7 @@ def main():
 
     barra = tk.Button(root, text='Adicionar barras', command=lambda: adicionaBarra(barra, coords, canvas, 
                                                                                    lines, text, botaoBarra, 
-                                                                                   botaoCoord, botaoNum, root,
+                                                                                   botaoCoord, root,
                                                                                    forcas))
     barra.place(relx=0.02, rely=0.05, relwidth=0.15, relheight=0.04, anchor='w')
 
@@ -110,16 +111,16 @@ def main():
     root.mainloop()
     
     
-def adicionaBarra(barra, coords, canvas, lines, text, botaoBarra, botaoCoord, botaoNum, root, forcas):
+def adicionaBarra(barra, coords, canvas, lines, text, botaoBarra, botaoCoord, root, forcas):
     barra.config(relief=SUNKEN)
     canvas.bind("<ButtonPress-1>", lambda event: click(coords, canvas, lines, botaoBarra, 
-                                                       botaoCoord, botaoNum, root, barra,
+                                                       botaoCoord, root, barra,
                                                        forcas, e=event))
     canvas.bind("<B1-Motion>", lambda event: drag(coords, canvas, lines, text, e=event))
 
     
 def click(coords, canvas, lines, botaoBarra, 
-          botaoCoord, botaoNum, root, barra, forcas, e):
+          botaoCoord, root, barra, forcas, e):
     # define start point for line
     coords["x"] = e.x
     coords["y"] = e.y
@@ -133,14 +134,15 @@ def click(coords, canvas, lines, botaoBarra,
     
     lines.append(canvas.create_line(coords["x"], coords["y"], coords["x"], coords["y"], fill="black", width=4))
 
-    adicionaBarraBotao(botaoBarra, botaoCoord, botaoNum, root, barra, canvas, lines, forcas)
+    adicionaBarraBotao(botaoBarra, botaoCoord, root, barra, canvas, lines, forcas)
     
     
-def adicionaBarraBotao(botaoBarra, botaoCoord, botaoNum, root, barra, canvas, lines, forcas): 
+def adicionaBarraBotao(botaoBarra, botaoCoord, root, barra, canvas, lines, forcas): 
+    global botaoNum
     botaoBarra.append(tk.Button(root, text="Barra {}".format(botaoNum + 1), 
                                 command=lambda num=botaoNum: botaoMenu(num, root, barra, canvas, 
                                                                        lines, forcas, botaoBarra, 
-                                                                       botaoNum, botaoCoord)))
+                                                                       botaoCoord)))
     botaoBarra[-1].place(relx=botaoCoord["relx"], rely=botaoCoord["rely"], relwidth=0.05, relheight=0.04, anchor='w')
     botaoNum += 1
     botaoCoord["relx"] += 0.06
@@ -182,7 +184,7 @@ def drag(coords, canvas, lines, text, e):
     canvas.coords(lines[-1], coords["x"], coords["y"], coords["x2"], coords["y2"])   
    
     
-def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoNum, botaoCoord):
+def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoCoord):
     barra.config(relief=RAISED)
     canvas.unbind("<ButtonPress-1>")
     canvas.unbind("<B1-Motion>")
@@ -294,7 +296,7 @@ def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoNum, bot
     # excluir button
     excluir = tk.Button(janela, text="Excluir Barra", 
                         command=lambda: excluirBarra(num, janela, canvas, 
-                                                     botaoBarra, botaoNum, 
+                                                     botaoBarra, 
                                                      botaoCoord, lines))
     excluir.grid(row=8, column=0, padx=5, pady=5, sticky=tk.W) 
     
@@ -425,7 +427,8 @@ def updateCoords(x, y, x2, y2, xEntry, yEntry, x2Entry, y2Entry):
     y2Entry.insert(0, "{:.2f}".format(y2))
     
 
-def excluirBarra(num, janela, canvas, botaoBarra, botaoNum, botaoCoord, lines):
+def excluirBarra(num, janela, canvas, botaoBarra, botaoCoord, lines):
+    global botaoNum
     canvas.delete(lines[num])
     lines[num] = None
     botaoBarra[num].destroy()
