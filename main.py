@@ -5,35 +5,11 @@ import math
 import numpy as np
 
 """ Implementações a serem consideradas """
-# !!!VER POSSIBILIDADE DE MUDAR CÓDIGO PARA ORIENTAÇÃO A OBJETOS!!!
-
 # ADICIONAR UM LABEL COM O NOME DA BARRA (exemplo: "Barra 1") AO LADO DE CADA 
 # BARRA PARA UMA VISUALIZAÇÃO MELHOR NO CANVAS
 
 
-""" Bugs a serem corrigidos """
-# CORRIGIR ERRO ONDE A FLECHA DA FORÇA CONCENTRADA É ADICIONADA TODA VEZ QUE
-# A JANELA É ABERTA NOVAMENTE. APENAS UMA FORÇA CONCENTRADA SERÁ APLICADA POR
-# BARRA? VERIFICAR A POSSIBILIDADE DE ADICIONAR MAIS FORÇAS.
-
-# CORRIGIR ERRO ONDE SLIDER DA FORÇA CONCENTRADA. O VALOR MÁXIMO DO SLIDER DA 
-# FORÇA NÃO ATUALIZA SE O MÓDULO(r) DA BARRA É ALTERADO DO VALOR INICIAL.
-
-# CORRIGIR ERRO EM QUE, SE O MÓDULO DA BARRA É ALTERADO APÓS UMA FORÇA É ADICIONADA
-# NA BARRA, A FORÇA FICA APLICADA FORA DA BARRA. VER SE VALE A PENA SIMPLESMENTE EXLUIR
-# A FORÇA SE ELA NÃO PERTENCE MAIS A BARRA OU IMPLEMENTAR UMA PROPORCIONALIDADE DA 
-# POSIÇÃO DA FORÇA EM RELAÇÃO AO TAMANHO DA BARRA.
-
-
 """ Implementações a serem feitas """
-# IMPLEMENTAR FUNÇÕES EXTRAS AO EXCLUIR UMA BARRA. NO MOMENTO QUANDO UMA BARRA É EXCLUIDA
-# A JANELA DA FORÇA CONCENTRADA NÃO SE FECHA E AS FLECHAS NÃO SÃO EXCLUIDAS DO CANVAS, ENTÃO
-# É NECESSÁRIO IMPLEMENTAR ISSO.
-
-# REMOVER FORÇA DISTRIBUIDA E VER POSSIBILIDADE DE AUMENTAR O NÚMERO DE FORÇAS CONCENTRADAS
-# POR BARRA. CASO AUMENTAR O NÚMERO DE FORÇAS PRA MAIS DE 1, UMA LISTA DE FORÇAS PRECISA
-# SER IMPLEMENTADA. 3 FORÇAS PARECE UM BOM NÚMERO.
-
 # IMPLEMENTAR ANGULAÇÃO DA FORÇA CONCENTRADA, USAR FUNÇÃO TANGENTE E VER IMPLEMENTAÇÃO DE
 # CÁLCULO DO ÂNGULO NA FUNÇÃO moduloTan() PARA FACILITAR A IMPLEMENTAÇÃO.
 
@@ -71,7 +47,6 @@ def main():
     lines = []
     text = []
     botaoBarra = []
-    forcas = []
     
     # label 1
     label1 = tk.Label(root, bg='#abaaa9')
@@ -79,6 +54,10 @@ def main():
 
     canvas = Canvas(root, bg="#ffffff")
     canvas.place(relx=1, rely=0.5, relwidth=0.8, relheight=1, anchor='e')
+    
+    forcas = [{"f1":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2), 
+               "f2":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2), 
+               "f3":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2)}]
 
     text.append(canvas.create_text(50, 50, text="x1: ", fill="black", font='Calibri 12'))
     text.append(canvas.create_text(50, 80, text="y1: ", fill="black", font='Calibri 12'))
@@ -263,7 +242,7 @@ def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoCoord):
     aplicarCoord = tk.Button(janela, text="Mudar coordenadas", 
                              command=lambda: mudarCoords(num, xVar, yVar, x2Var, 
                                                          y2Var, rVar, thetaVar, canvas, 
-                                                         lines, rEntry, thetaEntry))
+                                                         lines, rEntry, thetaEntry, forcas))
     aplicarCoord.grid(row=4, column=0, padx=5, pady=5, sticky=tk.N, columnspan=2)
     
     # aplicar polares button
@@ -271,23 +250,27 @@ def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoCoord):
                            command=lambda: mudarPol(num, xVar, yVar, x2Var, 
                                                     y2Var, rVar, thetaVar, canvas, 
                                                     lines, xEntry, yEntry, x2Entry, 
-                                                    y2Entry))
+                                                    y2Entry, forcas))
     aplicarPol.grid(row=4, column=2, padx=5, pady=5, sticky=tk.W)
     
     spacer1 = tk.Label(janela, text=" ",)
     spacer1.grid(row=5, column=0)
     
+    forcas.append({"f1":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2), 
+                   "f2":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2), 
+                   "f3":canvas.create_line(0, 0, 0, 0, arrow=tk.LAST, width=2)})
+    
     # adicionar forca button
     adicionarForca1 = tk.Button(janela, text="Força concentrada 1", 
-                                command=lambda: addForca(num, mt[0], mt[1], canvas, root, lines, forcas))
+                                command=lambda: addForca(num, mt[1], canvas, lines, forcas[num]["f1"], janela))
     adicionarForca1.grid(row=6, column=0, padx=5, pady=5, sticky=tk.N)
     
     adicionarForca2 = tk.Button(janela, text="Força concentrada 2", 
-                                command=lambda: addForca(num, mt[0], mt[1], canvas, root, lines, forcas))
+                                command=lambda: addForca(num, mt[1], canvas, lines, forcas[num]["f2"], janela))
     adicionarForca2.grid(row=6, column=1, padx=5, pady=5, sticky=tk.N)
     
     adicionarForca3 = tk.Button(janela, text="Força concentrada 3", 
-                                command=lambda: addForca(num, mt[0], mt[1], canvas, root, lines, forcas))
+                                command=lambda: addForca(num, mt[1], canvas, lines, forcas[num]["f3"], janela))
     adicionarForca3.grid(row=6, column=2, padx=5, pady=5, sticky=tk.N)
     
     spacer2 = tk.Label(janela, text="")
@@ -297,7 +280,7 @@ def botaoMenu(num, root, barra, canvas, lines, forcas, botaoBarra, botaoCoord):
     excluir = tk.Button(janela, text="Excluir Barra", 
                         command=lambda: excluirBarra(num, janela, canvas, 
                                                      botaoBarra, 
-                                                     botaoCoord, lines))
+                                                     botaoCoord, lines, forcas))
     excluir.grid(row=8, column=0, padx=5, pady=5, sticky=tk.W) 
     
     
@@ -320,18 +303,39 @@ def moduloTan (num, canvas, lines):
     
     return (modulo, tan)
 
+def anguloForca (canvas, forcas):
+    a = canvas.coords(forcas)[2] - canvas.coords(forcas)[0]
+    b = canvas.coords(forcas)[1] - canvas.coords(forcas)[3]
+    modulo = math.hypot(a, b)
 
-def addForca(num, mod, theta, canvas, root, lines, forcas):
-    janela = Toplevel(root)
+    if a == 0:
+        tan = 90
+    else:
+        tan = abs(np.rad2deg(math.atan(b/a)))
+        
+    if b > 0 and a < 0:
+        tan += 90
+    elif b < 0 and a < 0:
+        tan += 180
+    elif b < 0 and a > 0:
+        tan = 360 - tan
+    
+    return (modulo, tan)
+
+
+def addForca(num, theta, canvas, lines, forcas, janela):
+    janela = Toplevel(janela)
     janela.title("Forca aplicada da barra {}".format(num + 1))
     janela.geometry('480x360')
-    janela.minsize(220, 160)
-    janela.maxsize(220, 160)
+    janela.minsize(400, 180)
+    janela.maxsize(400, 180)
     
     x = canvas.coords(lines[num])[0]
     y = canvas.coords(lines[num])[1]
-    forcas.insert(num, canvas.create_line(x, y-100, x, y, arrow=tk.LAST, width=2))
     
+    if canvas.coords(forcas)[0] == 0:
+        canvas.coords(forcas, x, y-100, x, y)
+
     # forca label
     forcaVar = tk.StringVar()
     forcaLabel = tk.Label(janela, text='Magnitude da forca aplicada:')
@@ -339,6 +343,7 @@ def addForca(num, mod, theta, canvas, root, lines, forcas):
     
     # forca entry
     forcaEntry = tk.Entry(janela, textvariable=forcaVar, borderwidth=5, relief=tk.FLAT)
+    forcaEntry.insert(0, "{:.2f}".format(anguloForca(canvas, forcas)[0]))
     forcaEntry.grid(row=1, column=0, padx=5, pady=5)
     
     # slider label
@@ -347,7 +352,7 @@ def addForca(num, mod, theta, canvas, root, lines, forcas):
     
     # slider
     sliderVar = tk.DoubleVar()
-    slider = tk.Scale(janela, from_=0, to=mod, variable=sliderVar, orient='horizontal')
+    slider = tk.Scale(janela, from_=0, to=moduloTan(num, canvas, lines)[0], variable=sliderVar, orient='horizontal')
     slider.grid(row=3, column=0, ipadx=50)
     
     # aplicar forca button
@@ -355,6 +360,39 @@ def addForca(num, mod, theta, canvas, root, lines, forcas):
                         command=lambda: aplicarForca(num, theta, forcaVar, sliderVar, 
                                                      canvas, forcas, lines))
     aplicar.grid(row=4, column=0, padx=5, columnspan=2, pady=5, sticky=tk.W)
+    
+    # angulo da forca label
+    anguloVar = tk.StringVar()
+    anguloLabel = tk.Label(janela, text='Angulo da forca:')
+    anguloLabel.grid(row=0, column=1, padx=5, sticky=tk.W)
+    
+    # angulo entry
+    anguloEntry = tk.Entry(janela, textvariable=anguloVar, borderwidth=5, relief=tk.FLAT)
+    anguloEntry.insert(0, "{:.2f}".format(anguloForca(canvas, forcas)[1]))
+    anguloEntry.grid(row=1, column=1, padx=5, pady=5)
+    
+    # aplicar angulo button
+    aplicar = tk.Button(janela, text="Aplicar Angulo", command=lambda: mudarAnguloForcas(forcas, canvas))
+    aplicar.grid(row=2, column=1, padx=5, columnspan=2, pady=5, sticky=tk.W)
+    
+    
+def mudarAnguloForcas(forcas, canvas):
+    x = float(canvas.coords(forcas)[0])
+    y = float(canvas.coords(forcas)[1])
+    x2 = float(canvas.coords(forcas)[2])
+    y2 = float(canvas.coords(forcas)[3])
+    r = float(anguloForca(canvas, forcas)[0])
+    theta = float(anguloForca(canvas, forcas)[1])
+    
+    theta = 270 - theta
+    newX = r*(math.cos(np.deg2rad(theta)))
+    newY = r*(math.sin(np.deg2rad(theta)))
+
+    x2 = x + newX
+    y2 = y + newY
+        
+    theta = 360 - theta
+    canvas.coords(forcas, x, y, x2, y2)
     
     
 def aplicarForca(num, theta, forca, sliderVar, canvas, forcas, lines):
@@ -369,11 +407,11 @@ def aplicarForca(num, theta, forca, sliderVar, canvas, forcas, lines):
 
     newX = canvas.coords(lines[num])[0] + newX
     newY = canvas.coords(lines[num])[1] - newY
-
-    canvas.coords(forcas[num], newX, newY-forca, newX, newY)
+    
+    canvas.coords(forcas, newX, newY-forca, newX, newY)
     
     
-def mudarCoords(num, x, y, x2, y2, r, theta, canvas, lines, rEntry, thetaEntry):
+def mudarCoords(num, x, y, x2, y2, r, theta, canvas, lines, rEntry, thetaEntry, forcas):
     x = float(x.get()) 
     y = float(y.get())
     x2 = float(x2.get())
@@ -384,25 +422,39 @@ def mudarCoords(num, x, y, x2, y2, r, theta, canvas, lines, rEntry, thetaEntry):
     canvas.coords(lines[num], x, y, x2, y2)
     mt = moduloTan(num)
     updateModuloTan(mt[0], mt[1], rEntry, thetaEntry)
+    
+    try:
+        canvas.delete(forcas)
+        forcas[num] = None
+    except:
+        return
 
 
-def mudarPol(num, x, y, x2, y2, r, theta, canvas, lines, xEntry, yEntry, x2Entry, y2Entry):
+def mudarPol(num, x, y, x2, y2, r, theta, canvas, lines, xEntry, yEntry, x2Entry, y2Entry, forcas):
     x = float(x.get()) 
     y = float(y.get())
     x2 = float(x2.get())
     y2 = float(y2.get())
     r = float(r.get())
     theta = float(theta.get())
-    
+
     theta = 360 - theta
     newX = r*(math.cos(np.deg2rad(theta)))
     newY = r*(math.sin(np.deg2rad(theta)))
-    
+
     x2 = x + newX
     y2 = y + newY
+        
     theta = 360 - theta
     canvas.coords(lines[num], x, y, x2, y2)
+    
     updateCoords(x, y, x2, y2, xEntry, yEntry, x2Entry, y2Entry)
+    
+    try:
+        canvas.delete(forcas)
+        forcas[num] = None
+    except:
+        return
 
 
 def updateModuloTan(modulo, tan, rEntry, thetaEntry):
@@ -427,13 +479,20 @@ def updateCoords(x, y, x2, y2, xEntry, yEntry, x2Entry, y2Entry):
     y2Entry.insert(0, "{:.2f}".format(y2))
     
 
-def excluirBarra(num, janela, canvas, botaoBarra, botaoCoord, lines):
+def excluirBarra(num, janela, canvas, botaoBarra, botaoCoord, lines, forcas):
     global botaoNum
     canvas.delete(lines[num])
     lines[num] = None
     botaoBarra[num].destroy()
     botaoBarra[num] = None
     janela.destroy()
+    canvas.delete(forcas[num]["f1"])
+    canvas.delete(forcas[num]["f2"])
+    canvas.delete(forcas[num]["f2"])
+    
+    forcas[num]["f1"] = None
+    forcas[num]["f1"] = None
+    forcas[num]["f1"] = None
 
     botaoCoord = {"relx":0.01, "rely":0.55}
 
