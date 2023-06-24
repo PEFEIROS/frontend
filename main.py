@@ -304,22 +304,35 @@ def moduloTan (num, canvas, lines):
     return (modulo, tan)
 
 def anguloForca (canvas, forcas):
-    a = canvas.coords(forcas)[2] - canvas.coords(forcas)[0]
-    b = canvas.coords(forcas)[1] - canvas.coords(forcas)[3]
-    modulo = math.hypot(a, b)
+    dx = canvas.coords(forcas)[2] - canvas.coords(forcas)[0]
+    dy = canvas.coords(forcas)[1] - canvas.coords(forcas)[3]
+    modulo = math.hypot(dx, dy)
+    tan = 0
 
-    if a == 0:
-        tan = 90
+    if dx == 0:
+        print("salve1", dx, dy, 90)
     else:
-        tan = abs(np.rad2deg(math.atan(b/a)))
-        
-    if b > 0 and a < 0:
-        tan += 90
-    elif b < 0 and a < 0:
+        print("salve1", dx, dy, np.rad2deg(math.atan(dy/dx)))
+
+    if dx == 0:
+        tan = 90
+
+    else:
+        tan = np.rad2deg(math.atan(dy/dx))
+
+    if dx > 0 and dy > 0:
         tan += 180
-    elif b < 0 and a > 0:
-        tan = 360 - tan
-    
+    elif dx > 0 and dy == 0:
+        tan = 180
+    elif dx > 0 and dy < 0:
+        tan += 180
+    elif dx == 0 and dy > 0:
+        tan += 180
+    elif dx < 0 and dy > 0:
+        tan += 360
+    elif dx < 0 and dy == 0:
+        tan = 0
+
     return (modulo, tan)
 
 
@@ -372,26 +385,23 @@ def addForca(num, theta, canvas, lines, forcas, janela):
     anguloEntry.grid(row=1, column=1, padx=5, pady=5)
     
     # aplicar angulo button
-    aplicar = tk.Button(janela, text="Aplicar Angulo", command=lambda: mudarAnguloForcas(forcas, canvas))
+    aplicar = tk.Button(janela, text="Aplicar Angulo", command=lambda: mudarAnguloForcas(forcas, canvas, anguloVar))
     aplicar.grid(row=2, column=1, padx=5, columnspan=2, pady=5, sticky=tk.W)
     
-    
-def mudarAnguloForcas(forcas, canvas):
+def mudarAnguloForcas(forcas, canvas, anguloVar):
     x = float(canvas.coords(forcas)[0])
     y = float(canvas.coords(forcas)[1])
     x2 = float(canvas.coords(forcas)[2])
     y2 = float(canvas.coords(forcas)[3])
     r = float(anguloForca(canvas, forcas)[0])
-    theta = float(anguloForca(canvas, forcas)[1])
     
-    theta = 270 - theta
-    newX = r*(math.cos(np.deg2rad(theta)))
-    newY = r*(math.sin(np.deg2rad(theta)))
+    inputAngle = float(anguloVar.get()) 
+    newX = r*(math.cos(np.deg2rad(-inputAngle)))
+    newY = r*(math.sin(np.deg2rad(-inputAngle)))
 
-    x2 = x + newX
-    y2 = y + newY
-        
-    theta = 360 - theta
+    x = x2 + newX
+    y = y2 + newY
+  
     canvas.coords(forcas, x, y, x2, y2)
     
     
